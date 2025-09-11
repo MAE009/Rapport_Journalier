@@ -3,6 +3,7 @@ Private Sub Btn_Modifier_Click()
     Dim tbl As ListObject
     Dim ligne As Range
     Dim idx As Long
+    Dim rowTable As Long
     
     If Me.ListBox1.ListIndex = -1 Then
         MsgBox "Veuillez sélectionner un rapport à modifier.", vbExclamation
@@ -12,9 +13,10 @@ Private Sub Btn_Modifier_Click()
     Set ws = ThisWorkbook.Sheets("RJ")
     Set tbl = ws.ListObjects("suivi_interventio")
     
-    idx = Me.ListBox1.ListIndex + 1 ' Décalage car ListBox commence à 0
+    ' ⚠️ On récupère le numéro de ligne du tableau stocké dans la colonne cachée de la ListBox
+    rowTable = CLng(Me.ListBox1.List(Me.ListBox1.ListIndex, 0))  ' supposons que la col(0) contient l'index
     
-    Set ligne = tbl.DataBodyRange.Rows(idx)
+    Set ligne = tbl.DataBodyRange.Rows(rowTable)
     
     With ligne
         .Cells(1, 1).Value = Me.TxtNomBien.Value
@@ -31,6 +33,6 @@ Private Sub Btn_Modifier_Click()
         .Cells(1, 12).Value = Me.CboObservation.Value
     End With
     
-    Call ChargerListBox
+    Call ChargerRapports  ' recharge la liste
     MsgBox "Rapport modifié avec succès.", vbInformation
 End Sub
