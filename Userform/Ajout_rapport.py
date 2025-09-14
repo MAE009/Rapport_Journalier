@@ -14,35 +14,39 @@ Private Sub ChargerRapports(Optional ByVal filtreAnnee As String = "", _
                             Optional ByVal filtreMois As String = "", _
                             Optional ByVal filtreJour As String = "")
     Dim ws As Worksheet, tbl As ListObject, i As Long
+    Dim ligne() As Variant, j As Long
+    Dim dateDef As Date
+    
     Set ws = ThisWorkbook.Sheets("RJ")
     Set tbl = ws.ListObjects("suivi_interventio")
     
     Me.LstRapports.Clear
     
-    ' Charger les titres dans la ListBox (optionnel si MultiColumn)
-    Me.LstRapports.ColumnCount = tbl.ListColumns.Count
+    ' ➕ 1 colonne cachée pour garder l’index du tableau
+    Me.LstRapports.ColumnCount = tbl.ListColumns.Count + 1
+    ' cacher la 1ère colonne (index du tableau)
+    Me.LstRapports.ColumnWidths = "0;" & String(tbl.ListColumns.Count, "80;")
     
     For i = 1 To tbl.ListRows.Count
-        Dim ligne() As Variant
         ligne = tbl.ListRows(i).Range.Value
-        
-        ' Filtrage par date de défaillance
-        Dim dateDef As Date
         dateDef = ligne(1, 7) ' 7ème colonne = Date de défaillance
         
-        If (filtreAnnee = "" Or Year(dateDef) = filtreAnnee) And _
-           (filtreMois = "" Or Month(dateDef) = filtreMois) And _
-           (filtreJour = "" Or Day(dateDef) = filtreJour) Then
+        If (filtreAnnee = "" Or Year(dateDef) = Val(filtreAnnee)) And _
+           (filtreMois = "" Or Month(dateDef) = Val(filtreMois)) And _
+           (filtreJour = "" Or Day(dateDef) = Val(filtreJour)) Then
            
             Me.LstRapports.AddItem
-            Dim j As Long
+            
+            ' Colonne (0) → index de la ligne du tableau
+            Me.LstRapports.List(Me.LstRapports.ListCount - 1, 0) = i
+            
+            ' Les 12 colonnes visibles → données du tableau
             For j = 1 To UBound(ligne, 2)
-                Me.LstRapports.List(Me.LstRapports.ListCount - 1, j - 1) = ligne(1, j)
+                Me.LstRapports.List(Me.LstRapports.ListCount - 1, j) = ligne(1, j)
             Next j
         End If
     Next i
 End Sub
-
 
 
 Private Sub ChargerFiltres()
