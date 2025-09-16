@@ -1,0 +1,3 @@
+Private Sub btnRapportJournalier_Click()
+    Ajout_rapport.Show
+End Sub
